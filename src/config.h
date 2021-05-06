@@ -33,64 +33,8 @@ The authors of this program may be contacted at https://forum.princed.org
 #define SDLPOP_VERSION "1.21"
 #define WINDOW_TITLE "Prince of Persia (SDLPoP) v" SDLPOP_VERSION
 
-// Enable or disable the SDL hardware accelerated renderer backend
-// Uses a software backend otherwise
-#define USE_HW_ACCELERATION
-
-// Enable or disable fading.
-// Fading used to be very buggy, but now it works correctly.
-#define USE_FADE
-
-// Enable or disable the potions level. (copy protection)
-#define USE_COPYPROT
-
-// Enable or disable flashing.
-#define USE_FLASH
-
-//#define USE_ALPHA
-
-// Enable or disable texts.
-#define USE_TEXT
-
-// Use timers in a way that is more similar to the original game.
-// Was needed for the correct fading of cutscenes.
-// Disabled, because it introduces some timing bugs.
-//#define USE_COMPAT_TIMER
-
 // Enable quicksave/load feature.
 #define USE_QUICKSAVE
-
-// Try to let time keep running out when quickloading. (similar to Ctrl+A)
-// Technically, the 'remaining time' is still restored, but with a penalty for elapsed time (up to 1 minute).
-// The one minute penalty will also be applied when quickloading from e.g. the title screen.
-#define USE_QUICKLOAD_PENALTY
-
-#ifdef USE_QUICKSAVE // Replay relies on quicksave, because the replay file begins with a quicksave of the initial state.
-
-// Enable recording/replay feature.
-#define USE_REPLAY
-
-#endif
-
-// Adds a way to crouch immediately after climbing up: press down and forward simultaneously.
-// In the original game, this could not be done (pressing down always causes the kid to climb down).
-#define ALLOW_CROUCH_AFTER_CLIMBING
-
-// Time runs out while the level ending music plays; however, the music can be skipped by disabling sound.
-// This option stops time while the ending music is playing (so there is no need to disable sound).
-#define FREEZE_TIME_DURING_END_MUSIC
-
-// Enable fake/invisible tiles feature. Tiles may look like one tiletype but behave like another.
-// Currently works for empty tiles, walls, floors.
-// Use tile modifier 4 to display a fake floor, 5 to display a fake wall, 6 to display an empty tile
-// For now, for fake dungeon walls, the wall neighbors must be specified for now using tile modifiers:
-//      5 or 50 = no neighbors; 51 = wall to the right; 52 = wall to the left; 53 = walls on both sides
-// For fake palace walls:
-//      5 = wall including blue line; 50 = no blue
-#define USE_FAKE_TILES
-
-// Allow guard hitpoints not resetting to their default (maximum) value when re-entering the room
-#define REMEMBER_GUARD_HP
 
 // Enable completely disabling the time limit. To use this feature, set the starting time to -1.
 // This also disables the in-game messages that report how much time is left every minute.
@@ -256,56 +200,6 @@ The authors of this program may be contacted at https://forum.princed.org
 #define FIX_LEVEL_14_RESTARTING
 
 #endif // ifndef DISABLE_ALL_FIXES
-
-// Debug features:
-
-// When the program starts, check whether the deobfuscated sequence table (seqtbl.c) is correct.
-//#define CHECK_SEQTABLE_MATCHES_ORIGINAL
-
-// Print out every second how closely the in-game elapsed time corresponds to the actual elapsed time.
-//#define CHECK_TIMING
-
-
-// Enable debug cheats (with command-line argument "debug")
-// "[" and "]" : nudge x position by one pixel
-// "T" : display remaining time in minutes, seconds and ticks
-#define USE_DEBUG_CHEATS
-
-
-
-// Darken those parts of the screen which are not near a torch.
-#define USE_LIGHTING
-
-// Enable screenshot features.
-#define USE_SCREENSHOT
-
-// Automatically switch to keyboard or joystick/gamepad mode if there is input from that device.
-// Useful if SDL detected a gamepad but there is none.
-#define USE_AUTO_INPUT_MODE
-
-#ifdef USE_TEXT // The menu won't work without text.
-
-// Display the in-game menu.
-#define USE_MENU
-
-#endif
-
-// Enable colored torches. A torch can be colored by changing its modifier in a level editor.
-#define USE_COLORED_TORCHES
-
-// Enable fast forwarding with the backtick key.
-#define USE_FAST_FORWARD
-
-// Set how much should the fast forwarding speed up the game.
-#define FAST_FORWARD_RATIO 10
-
-// Speed up the sound during fast forward using resampling.
-// If disabled, the sound is sped up by clipping out parts from it.
-//#define FAST_FORWARD_RESAMPLE_SOUND
-
-// Mute the sound during fast forward.
-//#define FAST_FORWARD_MUTE
-
 
 // Default SDL_Joystick button values
 #define SDL_JOYSTICK_BUTTON_Y 2
