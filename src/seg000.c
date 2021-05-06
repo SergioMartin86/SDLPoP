@@ -1004,71 +1004,10 @@ void __pascal far anim_tile_modif() {
 
 // seg000:0B72
 void __pascal far load_sounds(int first,int last) {
-	dat_type* ibm_dat = NULL;
-	dat_type* digi1_dat = NULL;
-//	dat_type* digi2_dat = NULL;
-	dat_type* digi3_dat = NULL;
-	dat_type* midi_dat = NULL;
-	short current;
-	ibm_dat = open_dat("IBM_SND1.DAT", 0);
-	if (sound_flags & sfDigi) {
-		digi1_dat = open_dat("DIGISND1.DAT", 0);
-//		digi2_dat = open_dat("DIGISND2.DAT", 0);
-		digi3_dat = open_dat("DIGISND3.DAT", 0);
-	}
-	if (sound_flags & sfMidi) {
-		midi_dat = open_dat("MIDISND1.DAT", 0);
-	}
-
-	load_sound_names();
-
-	for (current = first; current <= last; ++current) {
-		if (sound_pointers[current] != NULL) continue;
-		/*if (demo_mode) {
-			sound_pointers[current] = decompress_sound((sound_buffer_type*) load_from_opendats_alloc(current + 10000));
-		} else*/ {
-			//sound_pointers[current] = (sound_buffer_type*) load_from_opendats_alloc(current + 10000, "bin", NULL, NULL);
-			//printf("overwriting sound_pointers[%d] = %p\n", current, sound_pointers[current]);
-
-
-			sound_pointers[current] = load_sound(current);
-		}
-	}
-	if (midi_dat) close_dat(midi_dat);
-	if (digi1_dat) close_dat(digi1_dat);
-//	if (digi2_dat) close_dat(digi2_dat);
-	if (digi3_dat) close_dat(digi3_dat);
-	close_dat(ibm_dat);
 }
 
 // seg000:0C5E
 void __pascal far load_opt_sounds(int first,int last) {
-	// stub
-	dat_type* ibm_dat = NULL;
-	dat_type* digi_dat = NULL;
-	dat_type* midi_dat = NULL;
-	short current;
-	ibm_dat = open_dat("IBM_SND2.DAT", 0);
-	if (sound_flags & sfDigi) {
-		digi_dat = open_dat("DIGISND2.DAT", 0);
-	}
-	if (sound_flags & sfMidi) {
-		midi_dat = open_dat("MIDISND2.DAT", 0);
-	}
-	for (current = first; current <= last; ++current) {
-		//We don't free sounds, so load only once.
-		if (sound_pointers[current] != NULL) continue;
-		/*if (demo_mode) {
-			sound_pointers[current] = decompress_sound((sound_buffer_type*) load_from_opendats_alloc(current + 10000));
-		} else*/ {
-			//sound_pointers[current] = (sound_buffer_type*) load_from_opendats_alloc(current + 10000, "bin", NULL, NULL);
-			//printf("overwriting sound_pointers[%d] = %p\n", current, sound_pointers[current]);
-			sound_pointers[current] = load_sound(current);
-		}
-	}
-	if (midi_dat) close_dat(midi_dat);
-	if (digi_dat) close_dat(digi_dat);
-	close_dat(ibm_dat);
 }
 
 // data:03BA
@@ -1386,22 +1325,6 @@ void __pascal far draw_kid_hp(short curr_hp,short max_hp) {
 
 // seg000:1159
 void __pascal far draw_guard_hp(short curr_hp,short max_hp) {
-	short drawn_hp_index;
-	short guard_charid;
-	if (chtab_addrs[id_chtab_5_guard] == NULL) return;
-	guard_charid = Guard.charid;
-	if (guard_charid != charid_4_skeleton &&
-		guard_charid != charid_24_mouse &&
-		// shadow has HP only on level 12
-		(guard_charid != charid_1_shadow || current_level == 12)
-	) {
-		for (drawn_hp_index = curr_hp; drawn_hp_index < max_hp; ++drawn_hp_index) {
-			method_6_blit_img_to_scr(chtab_addrs[id_chtab_5_guard]->images[0], 314 - drawn_hp_index * 7, 194, blitters_9_black);
-		}
-		for (drawn_hp_index = 0; drawn_hp_index < curr_hp; ++drawn_hp_index) {
-			method_6_blit_img_to_scr(chtab_addrs[id_chtab_5_guard]->images[0], 314 - drawn_hp_index * 7, 194, blitters_0_no_transp);
-		}
-	}
 }
 
 // seg000:11EC
@@ -1592,33 +1515,14 @@ void fix_sound_priorities() {
 
 // seg000:12C5
 void __pascal far play_sound(int sound_id) {
-	//printf("Would play sound %d\n", sound_id);
-	if (next_sound < 0 || sound_prio_table[sound_id] <= sound_prio_table[next_sound]) {
-		if (NULL == sound_pointers[sound_id]) return;
-		if (sound_pcspeaker_exists[sound_id] != 0 || sound_pointers[sound_id]->type != sound_speaker) {
-			next_sound = sound_id;
-		}
-	}
 }
 
 // seg000:1304
 void __pascal far play_next_sound() {
-	if (next_sound >= 0) {
-		if (!check_sound_playing() ||
-			(sound_interruptible[current_sound] != 0 && sound_prio_table[next_sound] <= sound_prio_table[current_sound])
-		) {
-			current_sound = next_sound;
-			play_sound_from_buffer(sound_pointers[current_sound]);
-		}
-	}
-	next_sound = -1;
 }
 
 // seg000:1353
 void __pascal far check_sword_vs_sword() {
-	if (Kid.frame == 167 || Guard.frame == 167) {
-		play_sound(sound_10_sword_vs_sword); // sword vs. sword
-	}
 }
 
 // seg000:136A
@@ -2162,28 +2066,9 @@ void __pascal far free_optional_sounds() {
 }
 
 void free_all_sounds() {
-	for (int i = 0; i < 58; ++i) {
-		free_sound(sound_pointers[i]);
-		sound_pointers[i] = NULL;
-	}
 }
 
 void load_all_sounds() {
-	if (!use_custom_levelset) {
-		load_sounds(0, 43);
-		load_opt_sounds(43, 56); //added
-	} else {
-		// First load any sounds included in the mod folder...
-		skip_normal_data_files = true;
-		load_sounds(0, 43);
-		load_opt_sounds(43, 56);
-		skip_normal_data_files = false;
-		// ... then load any missing sounds from SDLPoP's own resources.
-		skip_mod_data_files = true;
-		load_sounds(0, 43);
-		load_opt_sounds(43, 56);
-		skip_mod_data_files = false;
-	}
 }
 
 // seg000:22BB

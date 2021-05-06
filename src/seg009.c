@@ -2027,42 +2027,6 @@ void audio_callback(void* userdata, Uint8* stream_orig, int len_orig) {
 
 int digi_unavailable = 0;
 void init_digi() {
-	if (digi_unavailable) return;
-	if (digi_audiospec != NULL) return;
-	// Open the audio device. Called once.
-	//printf("init_digi(): called\n");
-
-	SDL_AudioFormat desired_audioformat;
-	SDL_version version;
-	SDL_GetVersion(&version);
-	//printf("SDL Version = %d.%d.%d\n", version.major, version.minor, version.patch);
-	if (version.major <= 2 && version.minor <= 0 && version.patch <= 3) {
-		// In versions before 2.0.4, 16-bit audio samples don't work properly (the sound becomes garbled).
-		// See: https://bugzilla.libsdl.org/show_bug.cgi?id=2389
-		// Workaround: set the audio format to 8-bit, if we are linking against an older SDL2 version.
-		desired_audioformat = AUDIO_U8;
-		printf("Your SDL.dll is older than 2.0.4. Using 8-bit audio format to work around resampling bug.");
-	} else {
-		desired_audioformat = AUDIO_S16SYS;
-	}
-
-	SDL_AudioSpec *desired;
-	desired = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
-	memset(desired, 0, sizeof(SDL_AudioSpec));
-	desired->freq = digi_samplerate; //buffer->digi.sample_rate;
-	desired->format = desired_audioformat;
-	desired->channels = 2;
-	desired->samples = 1024;
-	desired->callback = audio_callback;
-	desired->userdata = NULL;
-	if (SDL_OpenAudio(desired, NULL) != 0) {
-		sdlperror("init_digi: SDL_OpenAudio");
-		//quit(1);
-		digi_unavailable = 1;
-		return;
-	}
-	//SDL_PauseAudio(0);
-	digi_audiospec = desired;
 }
 
 const int sound_channel = 0;
@@ -2101,91 +2065,12 @@ char* sound_name(int index) {
 sound_buffer_type* convert_digi_sound(sound_buffer_type* digi_buffer);
 
 sound_buffer_type* load_sound(int index) {
-	sound_buffer_type* result = NULL;
-	//printf("load_sound(%d)\n", index);
-	init_digi();
-	if (enable_music && !digi_unavailable && result == NULL && index >= 0 && index < max_sound_id) {
-		//printf("Trying to load from music folder\n");
-
-		//load_sound_names();  // Moved to load_sounds()
-		if (sound_names != NULL && sound_name(index) != NULL) {
-			//printf("Loading from music folder\n");
-			do {
-				FILE* fp = NULL;
-				char filename[POP_MAX_PATH];
-				if (!skip_mod_data_files) {
-					// before checking the root directory, first try mods/MODNAME/
-					snprintf_check(filename, sizeof(filename), "%s/music/%s.ogg", mod_data_path, sound_name(index));
-					fp = fopen(filename, "rb");
-				}
-				if (fp == NULL && !skip_normal_data_files) {
-					snprintf_check(filename, sizeof(filename), "data/music/%s.ogg", sound_name(index));
-					fp = fopen(locate_file(filename), "rb");
-				}
-				if (fp == NULL) {
-					break;
-				}
-				// Read the entire file (undecoded) into memory.
-				struct stat info;
-				if (fstat(fileno(fp), &info))
-					break;
-				size_t file_size = (size_t) MAX(0, info.st_size);
-				byte* file_contents = malloc(file_size);
-				if (fread(file_contents, 1, file_size, fp) != file_size) {
-					free(file_contents);
-					fclose(fp);
-					break;
-				}
-				fclose(fp);
-
-				// Decoding the entire file immediately would make the loading time much longer.
-				// However, we can also create the decoder now, and only use it when we are actually playing the file.
-				// (In the audio callback, we'll decode chunks of samples to the output stream, as needed).
-				stb_vorbis* decoder = stb_vorbis_open_memory(file_contents, file_size, NULL, NULL);
-				if (decoder == NULL) {
-					free(file_contents);
-					break;
-				}
-				result = malloc(sizeof(sound_buffer_type));
-				result->type = sound_ogg;
-				result->ogg.total_length = stb_vorbis_stream_length_in_samples(decoder) * sizeof(short);
-				result->ogg.file_contents = file_contents; // Remember in case we want to free the sound later.
-				result->ogg.decoder = decoder;
-			} while(0); // do once (breakable block)
-		} else {
-			//printf("sound_names = %p\n", sound_names);
-			//printf("sound_names[%d] = %p\n", index, sound_name(index));
-		}
-	}
-	if (result == NULL) {
-		//printf("Trying to load from DAT\n");
-		result = (sound_buffer_type*) load_from_opendats_alloc(index + 10000, "bin", NULL, NULL);
-	}
-	if (result != NULL && (result->type & 7) == sound_digi) {
-		sound_buffer_type* converted = convert_digi_sound(result);
-		free(result);
-		result = converted;
-	}
-	if (result == NULL && !skip_normal_data_files) {
-		fprintf(stderr, "Failed to load sound %d '%s'\n", index, sound_name(index));
-	}
-	return result;
+	return NULL;
 }
 
 void play_ogg_sound(sound_buffer_type *buffer) {
-	init_digi();
-	if (digi_unavailable) return;
-	stop_sounds();
 
-	// Need to rewind the music, or else the decoder might continue where it left off, the last time this sound played.
-	stb_vorbis_seek_start(buffer->ogg.decoder);
-
-	SDL_LockAudio();
-    ogg_decoder = buffer->ogg.decoder;
-	SDL_UnlockAudio();
-	SDL_PauseAudio(0);
-
-	ogg_playing = 1;
+	ogg_playing = 0;
 }
 
 int wave_version = -1;
@@ -2270,23 +2155,6 @@ sound_buffer_type* convert_digi_sound(sound_buffer_type* digi_buffer) {
 
 // seg009:74F0
 void __pascal far play_digi_sound(sound_buffer_type far *buffer) {
-	//if (!is_sound_on) return;
-	init_digi();
-	if (digi_unavailable) return;
-	stop_digi();
-//	stop_sounds();
-	//printf("play_digi_sound(): called\n");
-	if ((buffer->type & 7) != sound_digi_converted) {
-		printf("Tried to play unconverted digi sound.\n");
-		return;
-	}
-	SDL_LockAudio();
-	digi_buffer = (byte*) buffer->converted.samples;
-	digi_playing = 1;
-	digi_remaining_length = buffer->converted.length;
-	digi_remaining_pos = digi_buffer;
-	SDL_UnlockAudio();
-	SDL_PauseAudio(0);
 }
 
 void free_sound(sound_buffer_type far *buffer) {
@@ -2300,36 +2168,7 @@ void free_sound(sound_buffer_type far *buffer) {
 
 // seg009:7220
 void __pascal far play_sound_from_buffer(sound_buffer_type far *buffer) {
-
-#ifdef USE_REPLAY
-	if (replaying && skipping_replay) return;
-#endif
-
-	// stub
-	if (buffer == NULL) {
-		printf("Tried to play NULL sound.\n");
-		//quit(1);
-		return;
-	}
-	switch (buffer->type & 7) {
-		case sound_speaker:
-			play_speaker_sound(buffer);
-		break;
-		case sound_digi_converted:
-		case sound_digi:
-			play_digi_sound(buffer);
-		break;
-		case sound_midi:
-			play_midi_sound(buffer);
-		break;
-		case sound_ogg:
-			play_ogg_sound(buffer);
-		break;
-		default:
-			printf("Tried to play unimplemented sound type %d.\n", buffer->type);
-			quit(1);
-		break;
-	}
+ free(buffer);
 }
 
 void turn_music_on_off(byte new_state) {
@@ -2426,11 +2265,18 @@ void __pascal far set_gr_mode(byte grmode) {
 #ifdef SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING
 	SDL_SetHint(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "1");
 #endif
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE |
-	             SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC ) != 0) {
-		sdlperror("set_gr_mode: SDL_Init");
-		quit(1);
+
+	Uint32 subsystem_init;
+	subsystem_init = SDL_WasInit(SDL_INIT_EVERYTHING);
+	if ((subsystem_init & SDL_INIT_VIDEO) == false)
+	{
+	 if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE |
+	              SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC ) != 0) {
+	  sdlperror("set_gr_mode: SDL_Init");
+	  quit(1);
+	 }
 	}
+
 
 	//SDL_EnableUNICODE(1); //deprecated
 	Uint32 flags = 0;
