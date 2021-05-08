@@ -416,7 +416,7 @@ void restore_room_after_quick_load() {
 		guardhp_curr = 0;
 	}
 
-	draw_hp();
+	//draw_hp();
 	loadkid_and_opp();
 	// Get rid of "press button" message if kid was dead before quickload.
 	text_time_total = text_time_remaining = 0;
