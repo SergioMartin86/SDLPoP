@@ -316,14 +316,14 @@ typedef struct test_timing_state_type {
 void test_timings(test_timing_state_type* state) {
 
 	if (!state->already_had_first_frame) {
-		state->level_start_counter = SDL_GetPerformanceCounter();
+		state->level_start_counter = 1);
 		state->ticks_left_at_level_start = (rem_min-1)*720 + rem_tick;
 		state->seconds_left_at_level_start = (1.0f / 60.0f) * (5 * state->ticks_left_at_level_start);
 		printf("Seconds left = %f\n", state->seconds_left_at_level_start);
 		state->already_had_first_frame = true;
 	} else if (rem_tick % 12 == 11) {
-		Uint64 current_counter = SDL_GetPerformanceCounter();
-		float actual_seconds_elapsed = (float)(current_counter - state->level_start_counter) / (float)SDL_GetPerformanceFrequency();
+		Uint64 current_counter = 1;
+		float actual_seconds_elapsed = 1;
 
 		int ticks_left = (rem_min-1)*720 + rem_tick;
 		float game_seconds_left = (1.0f / 60.0f) * (5 * ticks_left);
@@ -567,7 +567,7 @@ void __pascal far jump_through_mirror() {
 	check_mirror_image();
 	jumped_through_mirror = 0;
 	Char.charid = charid_1_shadow;
-	play_sound(sound_45_jump_through_mirror); // jump through mirror
+	//play_sound(sound_45_jump_through_mirror); // jump through mirror
 	saveshad();
 	guardhp_max = guardhp_curr = hitp_max;
 	hitp_curr = 1;
@@ -607,7 +607,7 @@ void __pascal far bump_into_opponent() {
 				if (Char.fall_y >= 33) return; // don't bump; dead
 				else if (Char.fall_y >= 22) { // medium land
 					take_hp(1);
-					play_sound(sound_16_medium_land);
+					//play_sound(sound_16_medium_land);
 				}
 			}
 			#endif
@@ -724,25 +724,7 @@ void __pascal far do_mouse() {
 
 // seg003:0AFC
 int __pascal far flash_if_hurt() {
-	if (flash_time != 0) {
-		do_flash(flash_color);
 		return 1;
-	} else if (hitp_delta < 0) {
-		if (is_joyst_mode && enable_controller_rumble) {
-			if (sdl_haptic != NULL) {
-				SDL_HapticRumblePlay(sdl_haptic, 1.0, 100); // rumble at full strength for 100 milliseconds
-#if SDL_VERSION_ATLEAST(2,0,9)
-			} else if (sdl_controller_ != NULL) {
-				SDL_GameControllerRumble(sdl_controller_, 0xFFFF, 0xFFFF, 100);
-			} else {
-				SDL_JoystickRumble(sdl_joystick_, 0xFFFF, 0xFFFF, 100);
-#endif
-			}
-		}
-		do_flash(color_12_brightred); // red
-		return 1;
-	}
-	return 0; // not flashed
 }
 
 // seg003:0B1A

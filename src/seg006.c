@@ -621,15 +621,15 @@ void __pascal far play_seq() {
 						is_guard_notice = 1;
 						break;
 					case SND_FOOTSTEP: // feet
-						play_sound(sound_23_footstep); // footstep
+						//play_sound(sound_23_footstep); // footstep
 						is_guard_notice = 1;
 						break;
 					case SND_BUMP: // bump
-						play_sound(sound_8_bumped); // touching a wall
+						//play_sound(sound_8_bumped); // touching a wall
 						is_guard_notice = 1;
 						break;
 					case SND_DRINK: // drink
-						play_sound(sound_18_drink); // drink
+						//play_sound(sound_18_drink); // drink
 						break;
 					case SND_LEVEL: // level
 #ifdef USE_REPLAY
@@ -638,9 +638,9 @@ void __pascal far play_seq() {
 
 						if (is_sound_on) {
 							if (current_level == 4) {
-								play_sound(sound_32_shadow_music); // end level with shadow (level 4)
+								//play_sound(sound_32_shadow_music); // end level with shadow (level 4)
 							} else if (current_level != 13 && current_level != 15) {
-								play_sound(sound_41_end_level_music); // end level
+								//play_sound(sound_41_end_level_music); // end level
 							}
 						}
 						break;
@@ -1149,7 +1149,7 @@ void __pascal far check_grab() {
 			seqtbl_offset_char(seq_15_grab_ledge_midair); // grab a ledge (after falling)
 			play_seq();
 			grab_timer = 12;
-			play_sound(sound_9_grab); // grab
+			//play_sound(sound_9_grab); // grab
 			is_screaming = 0;
 #ifdef FIX_CHOMPERS_NOT_STARTING
 			if (fixes->fix_chompers_not_starting) start_chompers();
@@ -1738,7 +1738,7 @@ void __pascal far proc_get_object() {
 	if (Char.charid != charid_0_kid || pickup_obj_type == 0) return;
 	if (pickup_obj_type == -1) {
 		have_sword = -1;
-		play_sound(sound_37_victory); // get sword
+		//play_sound(sound_37_victory); // get sword
 		flash_color = color_14_brightyellow;
 		flash_time = 8;
 	} else {
@@ -1746,7 +1746,7 @@ void __pascal far proc_get_object() {
 			case 0: // health
 				if (hitp_curr != hitp_max) {
 					stop_sounds();
-					play_sound(sound_33_small_potion); // small potion
+					//play_sound(sound_33_small_potion); // small potion
 					hitp_delta = 1;
 					flash_color = color_4_red;
 					flash_time = 2;
@@ -1754,7 +1754,7 @@ void __pascal far proc_get_object() {
 			break;
 			case 1: // life
 				stop_sounds();
-				play_sound(sound_30_big_potion); // big potion
+				//play_sound(sound_30_big_potion); // big potion
 				flash_color = color_4_red;
 				flash_time = 4;
 				add_life();
@@ -1771,7 +1771,7 @@ void __pascal far proc_get_object() {
 			break;
 			case 4: // hurt
 				stop_sounds();
-				play_sound(sound_13_kid_hurt); // Kid hurt (by potion)
+				//play_sound(sound_13_kid_hurt); // Kid hurt (by potion)
 				// Special event: blue potions on potions level take half of HP
 				if (current_level == 15) {
 					hitp_delta = - ((hitp_max + 1) >> 1);
@@ -1800,7 +1800,7 @@ void __pascal far play_death_music() {
 	} else {
 		sound_id = sound_24_death_regular; // death not in fight
 	}
-	play_sound(sound_id);
+	//play_sound(sound_id);
 }
 
 // seg006:15E8
@@ -1815,9 +1815,9 @@ void __pascal far on_guard_killed() {
 		flash_time = /*18*/ custom->jaffar_victory_flash_time;
 		is_show_time = 1;
 		leveldoor_open = 2;
-		play_sound(sound_43_victory_Jaffar); // Jaffar's death
+		//play_sound(sound_43_victory_Jaffar); // Jaffar's death
 	} else if (Char.charid != charid_1_shadow) {
-		play_sound(sound_37_victory); // Guard's death
+		//play_sound(sound_37_victory); // Guard's death
 	}
 }
 

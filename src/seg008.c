@@ -928,34 +928,8 @@ void __pascal far draw_back_fore(int which_table,int index) {
 
 
 SDL_Surface* hflip(SDL_Surface* input) {
-	int width = input->w;
-	int height = input->h;
-	int source_x, target_x;
-
 	// The simplest way to create a surface with same format as input:
-	SDL_Surface* output = SDL_ConvertSurface(input, input->format, 0);
-	SDL_SetSurfacePalette(output, input->format->palette);
-	// The copied image will be overwritten anyway.
-	if (output == NULL) {
-		sdlperror("hflip: SDL_ConvertSurface");
-		quit(1);
-	}
-
-	SDL_SetSurfaceBlendMode(input, SDL_BLENDMODE_NONE);
-	// Temporarily turn off alpha and colorkey on input. So we overwrite the output image.
-	SDL_SetColorKey(input, SDL_FALSE, 0);
-	SDL_SetColorKey(output, SDL_FALSE, 0);
-	SDL_SetSurfaceAlphaMod(input, 255);
-
-	for (source_x = 0, target_x = width-1; source_x < width; ++source_x, --target_x) {
-		SDL_Rect srcrect = {source_x, 0, 1, height};
-		SDL_Rect dstrect = {target_x, 0, 1, height};
-		if (SDL_BlitSurface(input/*32*/, &srcrect, output, &dstrect) != 0) {
-			sdlperror("hflip: SDL_BlitSurface");
-			quit(1);
-		}
-	}
-
+	SDL_Surface* output;
 	return output;
 }
 
@@ -1005,14 +979,14 @@ void __pascal far draw_mid(int index) {
 		xpos -= image->w/*width*/;
 		// for this version:
 		need_free_image = 1;
-		image = hflip(image);
+		//image = hflip(image);
 	}
 
 	if (midtable_entry->peel) {
-		add_peel(round_xpos_to_byte(xpos, 0), round_xpos_to_byte(image->w/*width*/ + xpos, 1), ypos, image->h/*height*/);
+		//add_peel(round_xpos_to_byte(xpos, 0), round_xpos_to_byte(image->w/*width*/ + xpos, 1), ypos, image->h/*height*/);
 	}
 	//printf("Midtable: drawing (chtab %d, image %d) at (x=%d, y=%d)\n",chtab_id,image_id,xpos,ypos); // debug
-	draw_image(image, mask, xpos, ypos, blit);
+	//draw_image(image, mask, xpos, ypos, blit);
 
 	if (chtab_flip_clip[chtab_id]) {
 		reset_clip_rect();
@@ -1584,7 +1558,7 @@ void __pascal far draw_objtable_item(int index) {
 		case 1: // shadow
 		shadow:
 			if (united_with_shadow == 2) {
-				play_sound(sound_41_end_level_music); // united with shadow
+				//play_sound(sound_41_end_level_music); // united with shadow
 			}
 			add_midtable(obj_chtab, obj_id + 1, obj_xh, obj_xl, obj_y, blitters_2_or, 1);
 			add_midtable(obj_chtab, obj_id + 1, obj_xh, obj_xl + 1, obj_y, blitters_3_xor, 1);

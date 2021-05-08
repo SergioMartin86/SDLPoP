@@ -198,7 +198,7 @@ void __pascal far start_game() {
 		first_start = 0;
 		setjmp(/*&*/setjmp_buf);
 	} else {
-		draw_rect(&screen_rect, 0);
+		//draw_rect(&screen_rect, 0);
 		show_quotes();
 		clear_screen_and_sounds();
 		longjmp(/*&*/setjmp_buf,-1);
@@ -405,7 +405,7 @@ void restore_room_after_quick_load() {
 	//draw_level_first();
 	//gen_palace_wall_colors();
 	is_guard_notice = 0; // prevent guard turning around immediately
-	draw_game_frame(); // for falling
+	//draw_game_frame(); // for falling
 	//redraw_screen(1); // for room_L
 
 	hitp_delta = guardhp_delta = 1; // force HP redraw
@@ -439,9 +439,9 @@ int quick_load() {
 		}
 
 		stop_sounds();
-		draw_rect(&screen_rect, 0);
+//		draw_rect(&screen_rect, 0);
 		update_screen();
-		delay_ticks(5); // briefly display a black screen as a visual cue
+//		delay_ticks(5); // briefly display a black screen as a visual cue
 
 		short old_rem_min = rem_min;
 		word old_rem_tick = rem_tick;
@@ -513,9 +513,6 @@ void check_quick_op() {
 #endif // USE_QUICKSAVE
 
 Uint32 temp_shift_release_callback(Uint32 interval, void *param) {
-	const Uint8* state = SDL_GetKeyboardState(NULL);
-	if (state[SDL_SCANCODE_LSHIFT]) key_states[SDL_SCANCODE_LSHIFT] = 1;
-	if (state[SDL_SCANCODE_RSHIFT]) key_states[SDL_SCANCODE_RSHIFT] = 1;
 	return 0; // causes the timer to be removed
 }
 
@@ -666,12 +663,6 @@ int __pascal far process_key() {
 				Uint32 delay = 250;
 				key_states[SDL_SCANCODE_LSHIFT] = 0;
 				key_states[SDL_SCANCODE_RSHIFT] = 0;
-				SDL_TimerID timer;
-				timer = SDL_AddTimer(delay, temp_shift_release_callback, NULL);
-				if (timer == 0) {
-					sdlperror("process_key: SDL_AddTimer");
-					quit(1);
-				}
 				if (current_level == 14) {
 					next_level = 1;
 				} else {
@@ -805,14 +796,14 @@ int __pascal far process_key() {
 			break;
 			case SDL_SCANCODE_S | WITH_SHIFT: // Shift+S
 				if (hitp_curr != hitp_max) {
-					play_sound(sound_33_small_potion); // small potion (cheat)
+					//play_sound(sound_33_small_potion); // small potion (cheat)
 					hitp_delta = 1;
 					flash_color = 4; // red
 					flash_time = 2;
 				}
 			break;
 			case SDL_SCANCODE_T | WITH_SHIFT: // Shift+T
-				play_sound(sound_30_big_potion); // big potion (cheat)
+				//play_sound(sound_30_big_potion); // big potion (cheat)
 				flash_color = 4; // red
 				flash_time = 4;
 				add_life();
@@ -844,7 +835,7 @@ int __pascal far process_key() {
 void __pascal far play_frame() {
 	// play feather fall music if there is more than 1 second of feather fall left
 	if (fixes->fix_quicksave_during_feather && is_feather_fall >= 10 && !check_sound_playing()) {
-		play_sound(sound_39_low_weight);
+		//play_sound(sound_39_low_weight);
 	}
 	do_mobs();
 	process_trobs();
@@ -865,7 +856,7 @@ void __pascal far play_frame() {
 	if (current_level == 0) {
 		// Special event: level 0 running exit
 		if (Kid.room == /*24*/ custom->demo_end_room) {
-			draw_rect(&screen_rect, 0);
+			//draw_rect(&screen_rect, 0);
 			start_level = -1;
 			need_quotes = 1;
 			start_game();
@@ -965,7 +956,7 @@ void __pascal far draw_game_frame() {
 				} else {
 					if (var_2 == 3) {
 						display_text_bottom("Press Button to Continue");
-						play_sound_from_buffer(sound_pointers[sound_38_blink]); // press button blink
+						//play_sound_from_buffer(sound_pointers[sound_38_blink]); // press button blink
 					}
 				}
 			}
@@ -1695,7 +1686,7 @@ void __pascal far feather_fall() {
 	flash_color = 2; // green
 	flash_time = 3;
 	stop_sounds();
-	play_sound(sound_39_low_weight); // low weight
+	//play_sound(sound_39_low_weight); // low weight
 }
 
 // seg000:1618
@@ -1707,36 +1698,6 @@ int __pascal far parse_grmode() {
 
 // seg000:172C
 void __pascal far gen_palace_wall_colors() {
-	dword old_randseed;
-	word prev_color;
-	short row;
-	short subrow;
-	word color_base;
-	short column;
-	word color;
-
-	old_randseed = random_seed;
-	random_seed = drawn_room;
-	prandom(1); // discard
-	for (row = 0; row < 3; row++) {
-		for (subrow = 0; subrow < 4; subrow++) {
-			if (subrow % 2) {
-				color_base = 0x61; // 0x61..0x64 in subrow 1 and 3
-			} else {
-				color_base = 0x66; // 0x66..0x69 in subrow 0 and 2
-			}
-			prev_color = -1;
-			for (column = 0; column <= 10; ++column) {
-				do {
-					color = color_base + prandom(3);
-				} while (color == prev_color);
-				palace_wall_colors[44 * row + 11 * subrow + column] = color;
-				//palace_wall_colors[row][subrow][column] = color;
-				prev_color = color;
-			}
-		}
-	}
-	random_seed = old_randseed;
 }
 
 // data:042E
@@ -1757,7 +1718,7 @@ void __pascal far show_title() {
 	fade_in_2(offscreen_surface, 0x1000); //STUB
 	method_1_blit_rect(onscreen_surface_, offscreen_surface, &screen_rect, &screen_rect, blitters_0_no_transp);
 	current_sound = sound_54_intro_music; // added
-	play_sound_from_buffer(sound_pointers[sound_54_intro_music]); // main theme
+	//play_sound_from_buffer(sound_pointers[sound_54_intro_music]); // main theme
 	start_timer(timer_0, 0x82);
 	draw_full_image(TITLE_PRESENTS);
 	do_wait(timer_0);
@@ -1795,7 +1756,7 @@ void __pascal far show_title() {
 		delay_ticks(1);
 	}
 //	method_1_blit_rect(onscreen_surface_, offscreen_surface, &screen_rect, &screen_rect, blitters_0_no_transp);
-	play_sound_from_buffer(sound_pointers[sound_55_story_1_absence]); // story 1: In the absence
+	//play_sound_from_buffer(sound_pointers[sound_55_story_1_absence]); // story 1: In the absence
 	transition_ltr();
 	pop_wait(timer_0, 0x258);
 	fade_out_2(0x800);
@@ -1860,31 +1821,11 @@ void __pascal far transition_ltr() {
 	transition_fps *= audio_speed;
 #endif
 	Uint64 counters_per_frame = perf_frequency / transition_fps;
-	last_transition_counter = SDL_GetPerformanceCounter();
 	int overshoot = 0;
 	for (position = 0; position < 320; position += 2) {
 		method_1_blit_rect(onscreen_surface_, offscreen_surface, &rect, &rect, 0);
 		rect.left += 2;
 		rect.right += 2;
-		if (overshoot > 0 && overshoot < 10) {
-			--overshoot;
-			continue; // On slow systems (e.g. Raspberry Pi), allow the animation to catch up, before refreshing the screen.
-		}
-		idle(); // modified
-		do_paused();
-		// Add an appropriate delay until the next frame, so that the animation isn't instantaneous on fast CPUs.
-		for (;;) {
-			Uint64 current_counter = SDL_GetPerformanceCounter();
-			int frametimes_elapsed = (int)((current_counter / counters_per_frame) - (last_transition_counter / counters_per_frame));
-			if (frametimes_elapsed > 0) {
-				overshoot = frametimes_elapsed - 1;
-				last_transition_counter = current_counter;
-				break; // Proceed to the next frame.
-			} else {
-				SDL_Delay(1);
-			}
-		}
-
 	}
 }
 
@@ -1902,39 +1843,6 @@ void __pascal far release_title_images() {
 
 // seg000:1C3A
 void __pascal far draw_full_image(enum full_image_id id) {
-	image_type* decoded_image;
-	image_type* mask = NULL;
-	int xpos, ypos, blit;
-
-	if (id >= MAX_FULL_IMAGES) return;
-	if (NULL == *full_image[id].chtab) return;
-	decoded_image = (*full_image[id].chtab)->images[full_image[id].id];
-	blit = full_image[id].blitter;
-	xpos = full_image[id].xpos;
-	ypos = full_image[id].ypos;
-
-	switch (blit) {
-	case blitters_white:
-		blit = get_text_color(15, color_15_brightwhite, 0x800);
-		/* fall through */
-	default:
-		method_3_blit_mono(decoded_image, xpos, ypos, blitters_0_no_transp, blit);
-		break;
-	case blitters_10h_transp:
-		if (graphics_mode == gmCga || graphics_mode == gmHgaHerc) {
-			//...
-		} else {
-			mask = decoded_image;
-		}
-		draw_image_transp(decoded_image, mask, xpos, ypos);
-		if (graphics_mode == gmCga || graphics_mode == gmHgaHerc) {
-			free_far(mask);
-		}
-		break;
-	case blitters_0_no_transp:
-		method_6_blit_img_to_scr(decoded_image, xpos, ypos, blit);
-		break;
-	}
 }
 
 // seg000:1D2C
@@ -1980,7 +1888,7 @@ void __pascal far save_game() {
 	goto loc_1D9B;
 	loc_1E18:
 	display_text_bottom("UNABLE TO SAVE GAME");
-	//play_sound_from_buffer(&sound_cant_save);
+	////play_sound_from_buffer(&sound_cant_save);
 	loc_1E2E:
 	text_time_remaining = 24;
 }
@@ -2101,9 +2009,6 @@ void __pascal far load_title_images(int bgcolor) {
 			color.g = 0x00;
 			color.b = 0x00;
 			color.a = 0xFF;
-		}
-		if (NULL != chtab_title40) {
-			SDL_SetPaletteColors(chtab_title40->images[0]->format->palette, &color, 14, 1);
 		}
 	} else if (graphics_mode == gmEga || graphics_mode == gmTga) {
 		// ...

@@ -36,7 +36,7 @@ void __pascal far seqtbl_offset_opp(int seq_index) {
 // seg005:0030
 void __pascal far do_fall() {
 	if (is_screaming == 0 && Char.fall_y >= 31) {
-		play_sound(sound_1_falling); // falling
+		//play_sound(sound_1_falling); // falling
 		is_screaming = 1;
 	}
 	if ((word)y_land[Char.curr_row + 1] > (word)Char.y) {
@@ -174,7 +174,7 @@ void __pascal far land() {
 					seq_id = seq_17_soft_land; // crouch (soft land)
 				}
 				if (Char.charid == charid_0_kid) {
-					play_sound(sound_17_soft_land); // soft land (crouch)
+					//play_sound(sound_17_soft_land); // soft land (crouch)
 					is_guard_notice = 1;
 				}
 			} else if (Char.fall_y < 33) {
@@ -184,7 +184,7 @@ void __pascal far land() {
 				// kid (or skeleton (bug!))
 				if (! take_hp(1)) {
 					// still alive
-					play_sound(sound_16_medium_land); // medium land
+					//play_sound(sound_16_medium_land); // medium land
 					is_guard_notice = 1;
 					seq_id = seq_20_medium_land; // medium land (lose 1 HP, crouch)
 				} else {
@@ -201,7 +201,7 @@ void __pascal far land() {
 		loc_5F6C:
 		take_hp(100);
 		loc_5F75:
-		play_sound(sound_0_fell_to_death); // prince crashing into the floor
+		//play_sound(sound_0_fell_to_death); // prince crashing into the floor
 		seq_id = seq_22_crushed; // dead (after falling)
 	}
 	seqtbl_offset_char(seq_id);
@@ -235,7 +235,7 @@ void __pascal far spiked() {
 	#endif
 	Char.x = char_dx_forward(8);
 	Char.fall_y = 0;
-	play_sound(sound_48_spiked); // something spiked
+	//play_sound(sound_48_spiked); // something spiked
 	take_hp(100);
 	seqtbl_offset_char(seq_51_spiked); // spiked
 	play_seq();
@@ -310,7 +310,7 @@ void __pascal far control_crouched() {
 		// Special event: music when crouching
 		if (! check_sound_playing()) {
 			if (need_level1_music == 1) {
-				play_sound(sound_25_presentation); // presentation (level 1 start)
+				//play_sound(sound_25_presentation); // presentation (level 1 start)
 				need_level1_music = 2;
 			} else {
 #ifdef USE_REPLAY
@@ -721,7 +721,7 @@ void __pascal far control_hanging() {
 				)))
 			) {
 				if (grab_timer == 0) {
-					play_sound(sound_8_bumped); // touching a wall (hang against wall)
+					//play_sound(sound_8_bumped); // touching a wall (hang against wall)
 				}
 				seqtbl_offset_char(seq_25_hang_against_wall); // hang against wall (straight)
 			} else {
@@ -864,7 +864,7 @@ void __pascal far draw_sword() {
 	}
 #endif
 	if (Char.charid == charid_0_kid) {
-		play_sound(sound_19_draw_sword); // taking out the sword
+		//play_sound(sound_19_draw_sword); // taking out the sword
 		offguard = 0;
 	} else if (Char.charid != charid_1_shadow) {
 		seq_id = seq_90_en_garde; // stand active

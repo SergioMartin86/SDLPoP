@@ -823,11 +823,6 @@ image_type* far __pascal far load_image(int resource_id, dat_pal_type* palette) 
 
 // seg009:13C4
 void __pascal far draw_image_transp(image_type far *image,image_type far *mask,int xpos,int ypos) {
-	if (graphics_mode == gmMcgaVga) {
-		draw_image_transp_vga(image, xpos, ypos);
-	} else {
-		// ...
-	}
 }
 
 // seg009:157E
@@ -950,7 +945,6 @@ void __pascal far fade_out_2(int rows) {
 // seg009:2288
 void __pascal far draw_image_transp_vga(image_type far *image,int xpos,int ypos) {
 	// stub
-	method_6_blit_img_to_scr(image, xpos, ypos, blitters_10h_transp);
 }
 
 #ifdef USE_TEXT
@@ -1181,151 +1175,33 @@ int __pascal far get_line_width(const char far *text,int length) {
 
 // seg009:3706
 int __pascal far draw_text_character(byte character) {
-	//printf("going to do draw_text_character...\n");
-	font_type* font = textstate.ptr_font;
-	int width = 0;
-	if (character <= font->last_char && character >= font->first_char) {
-		image_type* image = font->chtab->images[character - font->first_char]; //char_ptrs[character - font->first_char];
-		if (image != NULL) {
-			method_3_blit_mono(image, textstate.current_x, textstate.current_y - font->height_above_baseline, textstate.textblit, textstate.textcolor);
-			width = font->space_between_chars + image->w;
-		}
-	}
-	textstate.current_x += width;
-	return width;
+	return 0;
 }
 
 // seg009:377F
 int __pascal far draw_text_line(const char far *text,int length) {
-	//hide_cursor();
-	int width = 0;
-	const char* text_pos = text;
-	while (--length >= 0) {
-		width += draw_text_character(*(text_pos++));
-	}
-	//show_cursor();
-	return width;
+	return 0;
 }
 
 // seg009:3755
 int __pascal far draw_cstring(const char far *string) {
-	//hide_cursor();
-	int width = 0;
-	const char* text_pos = string;
-	while (*text_pos) {
-		width += draw_text_character(*(text_pos++));
-	}
-	//show_cursor();
-	return width;
+	return 0;
 }
 
 // seg009:3F01
 const rect_type far *__pascal draw_text(const rect_type far *rect_ptr,int x_align,int y_align,const char far *text,int length) {
-	//printf("going to do draw_text()...\n");
-	short rect_top;
-	short rect_height;
-	short rect_width;
-	//textinfo_type var_C;
-	short num_lines;
-	short font_line_distance;
-	//hide_cursor();
-	//get_textinfo(&var_C);
-	set_clip_rect(rect_ptr);
-	rect_width = rect_ptr->right - rect_ptr->left;
-	rect_top = rect_ptr->top;
-	rect_height = rect_ptr->bottom - rect_ptr->top;
-	num_lines = 0;
-	int rem_length = length;
-	const char* line_start = text;
-	#define MAX_LINES 100
-	const char* line_starts[MAX_LINES];
-	int line_lengths[MAX_LINES];
-	do {
-		int line_length = find_linebreak(line_start, rem_length, rect_width, x_align);
-		if (line_length == 0) break;
-		if (num_lines >= MAX_LINES) {
-			//... ERROR!
-			printf("draw_text(): Too many lines!\n");
-			quit(1);
-		}
-		line_starts[num_lines] = line_start;
-		line_lengths[num_lines] = line_length;
-		++num_lines;
-		line_start += line_length;
-		rem_length -= line_length;
-	} while(rem_length);
-	font_type* font = textstate.ptr_font;
-	font_line_distance = font->height_above_baseline + font->height_below_baseline + font->space_between_lines;
-	int text_height = font_line_distance * num_lines - font->space_between_lines;
-	int text_top = rect_top;
-	if (y_align >= 0) {
-		if (y_align <= 0) {
-			// middle
-			// The +1 is for simulating SHR + ADC/SBB.
-			text_top += (rect_height+1)/2 - (text_height+1)/2;
-		} else {
-			// bottom
-			text_top += rect_height - text_height;
-		}
-	}
-	textstate.current_y = text_top + font->height_above_baseline;
-	int i;
-	for (i = 0; i < num_lines; ++i) {
-		const char* line_pos = line_starts[i];
-		int line_length = line_lengths[i];
-		if (x_align < 0 &&
-			*line_pos == ' ' &&
-			i != 0 &&
-			*(line_pos-1) != '\n'
-		) {
-			// Skip over space if it's not at the beginning of a line.
-			++line_pos;
-			--line_length;
-			if (line_length != 0 &&
-				*line_pos == ' ' &&
-				*(line_pos-2) == '.'
-			) {
-				// Skip over second space after point.
-				++line_pos;
-				--line_length;
-			}
-		}
-		int line_width = get_line_width(line_pos,line_length);
-		int text_left = rect_ptr->left;
-		if (x_align >= 0) {
-			if (x_align <= 0) {
-				// center
-				text_left += rect_width/2 - line_width/2;
-			} else {
-				// right
-				text_left += rect_width - line_width;
-			}
-		}
-		textstate.current_x = text_left;
-		//printf("going to draw text line...\n");
-		draw_text_line(line_pos,line_length);
-		textstate.current_y += font_line_distance;
-	}
-	reset_clip_rect();
-	//set_textinfo(...);
-	//show_cursor();
-	return rect_ptr;
+	return NULL;
 }
 
 // seg009:3E4F
 void __pascal far show_text(const rect_type far *rect_ptr,int x_align,int y_align,const char far *text) {
 	// stub
 	//printf("show_text: %s\n",text);
-	draw_text(rect_ptr, x_align, y_align, text, strlen(text));
+//	draw_text(rect_ptr, x_align, y_align, text, strlen(text));
 }
 
 // seg009:04FF
 void __pascal far show_text_with_color(const rect_type far *rect_ptr,int x_align,int y_align, const char far *text,int color) {
-	short saved_textcolor;
-	saved_textcolor = textstate.textcolor;
-	textstate.textcolor = color;
-	show_text(rect_ptr, x_align, y_align, text);
-	textstate.textcolor = saved_textcolor;
 }
 
 // seg009:3A91
@@ -1352,7 +1228,7 @@ int __pascal far showmessage(char far *text,int arg_4,void far *arg_0) {
 	// However, this does not seem to be strictly necessary
 	if (NULL == offscreen_surface) offscreen_surface = make_offscreen_buffer(&screen_rect); // In case we get an error before there is an offsceen buffer
 	method_1_blit_rect(offscreen_surface, onscreen_surface_, &copyprot_dialog->peel_rect, &copyprot_dialog->peel_rect, 0);
-	draw_dialog_frame(copyprot_dialog);
+//	draw_dialog_frame(copyprot_dialog);
 	//saved_font_ptr = textstate.ptr_font;
 	//saved_font_ptr = current_target_surface->ptr_font;
 	//current_target_surface->ptr_font = ptr_font;
@@ -1405,76 +1281,33 @@ void __pascal far read_dialog_peel(dialog_type *dialog) {
 			dialog->peel = read_peel_from_screen(&dialog->peel_rect);
 		}
 		dialog->has_peel = 1;
-		draw_dialog_frame(dialog);
+//		draw_dialog_frame(dialog);
 	}
 }
 
 // seg009:09DE
 void __pascal far draw_dialog_frame(dialog_type *dialog) {
-	dialog->settings->method_2_frame(dialog);
+//	dialog->settings->method_2_frame(dialog);
 }
 
 // A pointer to this function is the first field of dialog_settings (data:2944)
 // Perhaps used when replacing a dialog's text with another text (?)
 // seg009:096F
 void __pascal far add_dialog_rect(dialog_type *dialog) {
-	draw_rect(&dialog->text_rect, color_0_black);
+//	draw_rect(&dialog->text_rect, color_0_black);
 }
 
 // seg009:09F0
 void __pascal far dialog_method_2_frame(dialog_type *dialog) {
-	rect_type rect;
-	short shadow_right = dialog->settings->shadow_right;
-	short shadow_bottom = dialog->settings->shadow_bottom;
-	short bottom_border = dialog->settings->bottom_border;
-	short outer_border = dialog->settings->outer_border;
-	short peel_top = dialog->peel_rect.top;
-	short peel_left = dialog->peel_rect.left;
-	short peel_bottom = dialog->peel_rect.bottom;
-	short peel_right = dialog->peel_rect.right;
-	short text_top = dialog->text_rect.top;
-	short text_left = dialog->text_rect.left;
-	short text_bottom = dialog->text_rect.bottom;
-	short text_right = dialog->text_rect.right;
-	// Draw outer border
-	rect = (rect_type) { peel_top, peel_left, peel_bottom - shadow_bottom, peel_right - shadow_right };
-	draw_rect(&rect, color_0_black);
-	// Draw shadow (right)
-	rect = (rect_type) { text_top, peel_right - shadow_right, peel_bottom, peel_right };
-	draw_rect(&rect, get_text_color(0, color_8_darkgray /*dialog's shadow*/, 0));
-	// Draw shadow (bottom)
-	rect = (rect_type) { peel_bottom - shadow_bottom, text_left, peel_bottom, peel_right };
-	draw_rect(&rect, get_text_color(0, color_8_darkgray /*dialog's shadow*/, 0));
-	// Draw inner border (left)
-	rect = (rect_type) { peel_top + outer_border, peel_left + outer_border, text_bottom, text_left };
-	draw_rect(&rect, color_15_brightwhite);
-	// Draw inner border (top)
-	rect = (rect_type) { peel_top + outer_border, text_left, text_top, text_right + dialog->settings->right_border - outer_border };
-	draw_rect(&rect, color_15_brightwhite);
-	// Draw inner border (right)
-	rect.top = text_top;
-	rect.left =  text_right;
-	rect.bottom = text_bottom + bottom_border - outer_border;           // (rect.right stays the same)
-	draw_rect(&rect, color_15_brightwhite);
-	// Draw inner border (bottom)
-	rect = (rect_type) { text_bottom, peel_left + outer_border, text_bottom + bottom_border - outer_border, text_right };
-	draw_rect(&rect, color_15_brightwhite);
 }
 
 // seg009:0C44
 void __pascal far show_dialog(const char *text) {
-	char string[256];
-	snprintf(string, sizeof(string), "%s\n\nPress any key to continue.", text);
-	showmessage(string, 1, &key_test_quit);
 }
 
 // seg009:0791
 int __pascal far get_text_center_y(const rect_type far *rect) {
-	const font_type far* font;
-	short empty_height; // height of empty space above+below the line of text
-	font = &hc_font;//current_target_surface->ptr_font;
-	empty_height = rect->bottom - font->height_above_baseline - font->height_below_baseline - rect->top;
-	return ((empty_height - empty_height % 2) >> 1) + font->height_above_baseline + empty_height % 2 + rect->top;
+	return 0;
 }
 
 // seg009:3E77
@@ -1586,7 +1419,7 @@ int __pascal far draw_text_character(byte character) {
 // seg009:3E4F
 void __pascal far show_text(const rect_type far *rect_ptr,int x_align,int y_align,const char far *text) {
 	// stub
-	printf("show_text: %s\n",text);
+//	printf("show_text: %s\n",text);
 }
 
 // seg009:04FF
@@ -2380,120 +2213,9 @@ SDL_Surface* get_final_surface() {
 }
 
 void draw_overlay() {
-	int overlay = 0;
-	is_overlay_displayed = false;
-#ifdef USE_DEBUG_CHEATS
-	if (is_timer_displayed && start_level > 0) overlay = 1; // Timer overlay
-	else if (fixes->fix_quicksave_during_feather &&
-				is_feather_timer_displayed &&
-				start_level > 0 &&
-				is_feather_fall > 0) {
-		overlay = 3; // Feather timer overlay
-	}
-#endif
-#ifdef USE_MENU
-	// Menu overlay - not drawn here directly, only copied from the overlay surface.
-	if (is_paused && is_menu_shown) overlay = 2;
-#endif
-	if (overlay != 0) {
-		is_overlay_displayed = true;
-		surface_type* saved_target_surface = current_target_surface;
-		current_target_surface = overlay_surface;
-		rect_type drawn_rect;
-		if (overlay == 1) {
-#ifdef USE_DEBUG_CHEATS
-			char timer_text[32];
-			if (rem_min < 0) {
-				snprintf(timer_text, sizeof(timer_text), "%02d:%02d:%02d",
-				         -(rem_min + 1), (719 - rem_tick) / 12, (719 - rem_tick) % 12);
-			} else {
-				snprintf(timer_text, sizeof(timer_text), "%02d:%02d:%02d",
-				         rem_min - 1, rem_tick / 12, rem_tick % 12);
-			}
-			int expected_numeric_chars = 6;
-			int extra_numeric_chars = MAX(0, strnlen(timer_text, sizeof(timer_text)) - 8);
-			int line_width = 5 + (expected_numeric_chars + extra_numeric_chars) * 9;
-
-			rect_type timer_box_rect = {0, 0, 11, 2 + line_width};
-			rect_type timer_text_rect = {2, 2, 10, 100};
-			draw_rect_with_alpha(&timer_box_rect, color_0_black, 128);
-			show_text(&timer_text_rect, -1, -1, timer_text);
-
-#ifdef USE_REPLAY
-			// During playback, display the number of ticks since start, if the timer is shown (debug cheats: T).
-			if (replaying) {
-				char ticks_text[12];
-				snprintf(ticks_text, sizeof(ticks_text), "T: %d", curr_tick);
-				rect_type ticks_box_rect = timer_box_rect;
-				ticks_box_rect.top += 12;
-				ticks_box_rect.bottom += 12;
-				rect_type ticks_text_rect = timer_text_rect;
-				ticks_text_rect.top += 12;
-				ticks_text_rect.bottom += 12;
-
-				draw_rect_with_alpha(&ticks_box_rect, color_0_black, 128);
-				show_text(&ticks_text_rect, -1, -1, ticks_text);
-
-				timer_box_rect.bottom += 12;
-			}
-#endif
-
-			drawn_rect = timer_box_rect; // Only need to blit this bit to the merged_surface.
-#endif
-		} else if (overlay == 3) { // Feather timer
-#ifdef USE_DEBUG_CHEATS
-			char timer_text[32];
-			int ticks_per_sec = get_ticks_per_sec(timer_1);
-			snprintf(timer_text, sizeof(timer_text), "%02d:%02d", is_feather_fall / ticks_per_sec, is_feather_fall % ticks_per_sec);
-			int expected_numeric_chars = 6;
-			int extra_numeric_chars = MAX(0, strnlen(timer_text, sizeof(timer_text)) - 8);
-			int line_width = 5 + (expected_numeric_chars + extra_numeric_chars) * 9;
-
-			rect_type timer_box_rect = {0, 0, 11, 2 + line_width};
-			rect_type timer_text_rect = {2, 2, 10, 100};
-			draw_rect_with_alpha(&timer_box_rect, color_0_black, 128);
-			show_text_with_color(&timer_text_rect, -1, -1, timer_text, color_10_brightgreen);
-
-			drawn_rect = timer_box_rect; // Only need to blit this bit to the merged_surface.
-#endif
-		} else {
-			drawn_rect = screen_rect; // We'll blit the whole contents of overlay_surface to the merged_surface.
-		}
-		SDL_Rect sdl_rect;
-		rect_to_sdlrect(&drawn_rect, &sdl_rect);
-		SDL_BlitSurface(onscreen_surface_, NULL, merged_surface, NULL);
-		SDL_BlitSurface(overlay_surface, &sdl_rect, merged_surface, &sdl_rect);
-		current_target_surface = saved_target_surface;
-	}
 }
 
 void update_screen() {
-	draw_overlay();
-	SDL_Surface* surface = get_final_surface();
-	init_scaling();
-	if (scaling_type == 1) {
-		// Make "fuzzy pixels" like DOSBox does:
-		// First scale to double size with nearest-neighbor scaling, then scale to full screen with smooth scaling.
-		// The result is not as blurry as if we did only a smooth scaling, but not as sharp as if we did only nearest-neighbor scaling.
-		if (is_renderer_targettexture_supported) {
-			SDL_UpdateTexture(texture_sharp, NULL, surface->pixels, surface->pitch);
-			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-			SDL_SetRenderTarget(renderer_, target_texture);
-			SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-			SDL_RenderClear(renderer_);
-			SDL_RenderCopy(renderer_, texture_sharp, NULL, NULL);
-			SDL_SetRenderTarget(renderer_, NULL);
-		} else {
-			SDL_BlitScaled(surface, NULL, onscreen_surface_2x, NULL);
-			surface = onscreen_surface_2x;
-			SDL_UpdateTexture(target_texture, NULL, surface->pixels, surface->pitch);
-		}
-	} else {
-		SDL_UpdateTexture(target_texture, NULL, surface->pixels, surface->pitch);
-	}
-	SDL_RenderClear(renderer_);
-	SDL_RenderCopy(renderer_, target_texture, NULL, NULL);
-	SDL_RenderPresent(renderer_);
 }
 
 // seg009:9289
@@ -2678,7 +2400,6 @@ void far *__pascal load_from_opendats_alloc(int resource, const char* extension,
 
 // seg009:A172
 int __pascal far load_from_opendats_to_area(int resource,void far *area,int length, const char* extension) {
-	// stub
 	//return 0;
 	dat_type* pointer;
 	data_location result;
@@ -2834,53 +2555,9 @@ const rect_type far * __pascal far method_5_rect(const rect_type far *rect,int b
 }
 
 void draw_rect_with_alpha(const rect_type* rect, byte color, byte alpha) {
-	SDL_Rect dest_rect;
-	rect_to_sdlrect(rect, &dest_rect);
-	rgb_type palette_color = palette[color];
-	uint32_t rgb_color = SDL_MapRGBA(overlay_surface->format, palette_color.r<<2, palette_color.g<<2, palette_color.b<<2, alpha);
-	if (safe_SDL_FillRect(current_target_surface, &dest_rect, rgb_color) != 0) {
-		sdlperror("draw_rect_with_alpha: SDL_FillRect");
-		quit(1);
-	}
 }
 
 void draw_rect_contours(const rect_type* rect, byte color) {
-	// TODO: handle 24 bit surfaces? (currently, 32 bit surface is assumed)
-	if (current_target_surface->format->BitsPerPixel != 32) {
-		printf("draw_rect_contours: not implemented for %d bit surfaces\n", current_target_surface->format->BitsPerPixel);
-		return;
-	}
-	SDL_Rect dest_rect;
-	rect_to_sdlrect(rect, &dest_rect);
-	rgb_type palette_color = palette[color];
-	uint32_t rgb_color = SDL_MapRGBA(overlay_surface->format, palette_color.r<<2, palette_color.g<<2, palette_color.b<<2, 0xFF);
-	if (SDL_LockSurface(current_target_surface) != 0) {
-		sdlperror("draw_rect_contours: SDL_LockSurface");
-		quit(1);
-	}
-	int bytes_per_pixel = current_target_surface->format->BytesPerPixel;
-	int pitch = current_target_surface->pitch;
-	byte* pixels = current_target_surface->pixels;
-	int xmin = MIN(dest_rect.x,               current_target_surface->w);
-	int xmax = MIN(dest_rect.x + dest_rect.w, current_target_surface->w);
-	int ymin = MIN(dest_rect.y,               current_target_surface->h);
-	int ymax = MIN(dest_rect.y + dest_rect.h, current_target_surface->h);
-	byte* row = pixels + ymin*pitch;
-	uint32_t* pixel =  (uint32_t*) (row + xmin*bytes_per_pixel);
-	for (int x = xmin; x < xmax; ++x) {
-		*pixel++ = rgb_color;
-	}
-	for (int y = ymin+1; y < ymax-1; ++y) {
-		row += pitch;
-		*(uint32_t*)(row + xmin*bytes_per_pixel) = rgb_color;
-		*(uint32_t*)(row + (xmax-1)*bytes_per_pixel) = rgb_color;
-	}
-	pixel = (uint32_t*) (pixels + (ymax-1)*pitch + xmin*bytes_per_pixel);
-	for (int x = xmin; x < xmax; ++x) {
-		*pixel++ = rgb_color;
-	}
-
-	SDL_UnlockSurface(current_target_surface);
 }
 
 void blit_xor(SDL_Surface* target_surface, SDL_Rect* dest_rect, SDL_Surface* image, SDL_Rect* src_rect) {
@@ -2934,92 +2611,8 @@ void blit_xor(SDL_Surface* target_surface, SDL_Rect* dest_rect, SDL_Surface* ima
 	SDL_FreeSurface(helper_surface);
 }
 
-#ifdef USE_COLORED_TORCHES
-void draw_colored_torch(int color, SDL_Surface* image, int xpos, int ypos) {
-	if (SDL_SetColorKey(image, SDL_TRUE, 0) != 0) {
-		sdlperror("draw_colored_torch: SDL_SetColorKey");
-		quit(1);
-	}
-
-	SDL_Surface* colored_image = SDL_ConvertSurfaceFormat(image, SDL_PIXELFORMAT_ARGB8888, 0);
-	SDL_SetSurfaceBlendMode(colored_image, SDL_BLENDMODE_NONE);
-
-	if (SDL_LockSurface(colored_image) != 0) {
-		sdlperror("draw_colored_torch: SDL_LockSurface");
-		quit(1);
-	}
-
-	int w = colored_image->w;
-	int h = colored_image->h;
-	int y,x;
-	int iRed = ((color >> 4) & 3) * 85;
-	int iGreen = ((color >> 2) & 3) * 85;
-	int iBlue = ((color >> 0) & 3) * 85;
-	uint32_t old_color = SDL_MapRGB(colored_image->format, 0xFC, 0x84, 0x00) & 0xFFFFFF; // the orange in the flame
-	uint32_t new_color = SDL_MapRGB(colored_image->format, iRed, iGreen, iBlue) & 0xFFFFFF;
-	int stride = colored_image->pitch;
-	for (y = 0; y < h; ++y) {
-		uint32_t* pixel_ptr = (uint32_t*) ((byte*)colored_image->pixels + stride * y);
-		for (x = 0; x < w; ++x) {
-			if ((*pixel_ptr & 0xFFFFFF) == old_color) {
-				// set RGB but leave alpha
-				*pixel_ptr = (*pixel_ptr & 0xFF000000) | new_color;
-			}
-			++pixel_ptr;
-		}
-	}
-	SDL_UnlockSurface(colored_image);
-
-	method_6_blit_img_to_scr(colored_image, xpos, ypos, blitters_0_no_transp);
-	SDL_FreeSurface(colored_image);
-}
-#endif
 
 image_type far * __pascal far method_6_blit_img_to_scr(image_type far *image,int xpos,int ypos,int blit) {
-	if (image == NULL) {
-		printf("method_6_blit_img_to_scr: image == NULL\n");
-		//quit(1);
-		return NULL;
-	}
-
-	if (blit == blitters_9_black) {
-		method_3_blit_mono(image, xpos, ypos, blitters_9_black, 0);
-		return image;
-	}
-
-	SDL_Rect src_rect = {0, 0, image->w, image->h};
-	SDL_Rect dest_rect = {xpos, ypos, image->w, image->h};
-
-	if (blit == blitters_3_xor) {
-		blit_xor(current_target_surface, &dest_rect, image, &src_rect);
-		return image;
-	}
-
-#ifdef USE_COLORED_TORCHES
-	if (blit >= blitters_colored_flame && blit <= blitters_colored_flame_last) {
-		draw_colored_torch(blit - blitters_colored_flame, image, xpos, ypos);
-		return image;
-	}
-#endif
-
-	SDL_SetSurfaceBlendMode(image, SDL_BLENDMODE_NONE);
-	SDL_SetSurfaceAlphaMod(image, 255);
-
-	if (blit == blitters_0_no_transp) {
-		SDL_SetColorKey(image, SDL_FALSE, 0);
-	}
-	else {
-		SDL_SetColorKey(image, SDL_TRUE, 0);
-	}
-	if (SDL_BlitSurface(image, &src_rect, current_target_surface, &dest_rect) != 0) {
-		sdlperror("method_6_blit_img_to_scr: SDL_BlitSurface 2247");
-		quit(1);
-	}
-
-	if (SDL_SetSurfaceAlphaMod(image, 0) != 0) {
-		sdlperror("method_6_blit_img_to_scr: SDL_SetAlpha");
-		quit(1);
-	}
 	return image;
 }
 
@@ -3724,146 +3317,19 @@ palette_fade_type far *__pascal make_pal_buffer_fadeout(int which_rows,int wait_
 
 // seg009:1DAF
 void __pascal far pal_restore_free_fadeout(palette_fade_type far *palette_buffer) {
-	surface_type* surface;
-	surface = current_target_surface;
-	current_target_surface = onscreen_surface_;
-	draw_rect(&screen_rect, 0);
-	current_target_surface = surface;
-	set_pal_256(palette_buffer->original_pal);
-	free_far(palette_buffer);
-	// for RGB
-	method_5_rect(&screen_rect, 0, 0);
-}
-
-// seg009:1DF7
-int __pascal far fade_out_frame(palette_fade_type far *palette_buffer) {
-	rgb_type* faded_pal_ptr;
-	word start;
-	word var_8;
-	word column;
-	word current_row_mask;
-	byte* curr_color_ptr;
-	var_8 = 1;
-	++palette_buffer->fade_pos; // modified
-	/**/start_timer(timer_1, palette_buffer->wait_time); // too slow?
-	for (start=0,current_row_mask=1; start<0x100; start+=0x10, current_row_mask<<=1) {
-		if (palette_buffer->which_rows & current_row_mask) {
-			//var_12 = palette_buffer->
-			//original_pal_ptr = palette_buffer->original_pal + start;
-			faded_pal_ptr = palette_buffer->faded_pal + start;
-			for (column = 0; column<0x10; ++column) {
-				curr_color_ptr = &faded_pal_ptr[column].r;
-				if (*curr_color_ptr != 0) {
-					--*curr_color_ptr;
-					var_8 = 0;
-				}
-				curr_color_ptr = &faded_pal_ptr[column].g;
-				if (*curr_color_ptr != 0) {
-					--*curr_color_ptr;
-					var_8 = 0;
-				}
-				curr_color_ptr = &faded_pal_ptr[column].b;
-				if (*curr_color_ptr != 0) {
-					--*curr_color_ptr;
-					var_8 = 0;
-				}
-			}
-		}
-	}
-	column = 0;
-	for (start = 0, current_row_mask = 1; start<0x100; start+=0x10, current_row_mask<<=1) {
-		if (palette_buffer->which_rows & current_row_mask) {
-			set_pal_arr(start, 0x10, palette_buffer->faded_pal + start, (column++&3)==0);
-		}
-	}
-
-	int h = offscreen_surface->h;
-	if (SDL_LockSurface(onscreen_surface_) != 0) {
-		sdlperror("fade_out_frame: SDL_LockSurface");
-		quit(1);
-	}
-	if (SDL_LockSurface(offscreen_surface) != 0) {
-		sdlperror("fade_out_frame: SDL_LockSurface");
-		quit(1);
-	}
-	int y,x;
-	int on_stride = onscreen_surface_->pitch;
-	int off_stride = offscreen_surface->pitch;
-	int fade_pos = palette_buffer->fade_pos;
-	for (y = 0; y < h; ++y) {
-		byte* on_pixel_ptr = (byte*)onscreen_surface_->pixels + on_stride * y;
-		byte* off_pixel_ptr = (byte*)offscreen_surface->pixels + off_stride * y;
-		for (x = 0; x < on_stride; ++x) {
-			//if (*pixel_ptr >= 4) *pixel_ptr -= 4;
-			int v = *off_pixel_ptr - fade_pos*4;
-			if (v<0) v=0;
-			*on_pixel_ptr = v;
-			++on_pixel_ptr; ++off_pixel_ptr;
-		}
-	}
-	SDL_UnlockSurface(onscreen_surface_);
-	SDL_UnlockSurface(offscreen_surface);
-
-	do_simple_wait(timer_1); // can interrupt fading of cutscene
-	return var_8;
+	return 0;
 }
 
 // seg009:1F28
 void __pascal far read_palette_256(rgb_type far *target) {
-	int i;
-	for (i = 0; i < 256; ++i) {
-		target[i] = palette[i];
-	}
 }
 
 // seg009:1F5E
 void __pascal far set_pal_256(rgb_type far *source) {
-	int i;
-	for (i = 0; i < 256; ++i) {
-		palette[i] = source[i];
-	}
 }
 #endif // USE_FADE
 
 void set_chtab_palette(chtab_type* chtab, byte* colors, int n_colors) {
-	if (chtab != NULL) {
-		SDL_Color* scolors = (SDL_Color*) malloc(n_colors*sizeof(SDL_Color));
-		int i;
-		//printf("scolors\n",i);
-		for (i = 0; i < n_colors; ++i) {
-			//printf("i=%d\n",i);
-			scolors[i].r = *colors << 2; ++colors;
-			scolors[i].g = *colors << 2; ++colors;
-			scolors[i].b = *colors << 2; ++colors;
-			scolors[i].a = SDL_ALPHA_OPAQUE; // the SDL2 SDL_Color struct has an alpha component
-		}
-
-		// Color 0 of the palette data is not used, it is replaced by the background color.
-		// Needed for correct alternate colors (v1.3) of level 8.
-		scolors[0].r = scolors[0].g = scolors[0].b = 0;
-		scolors[0].a = SDL_ALPHA_TRANSPARENT;
-
-		//printf("setcolors\n",i);
-		for (i = 0; i < chtab->n_images; ++i) {
-			//printf("i=%d\n",i);
-			image_type* current_image = chtab->images[i];
-			if (current_image != NULL) {
-
-				int n_colors_to_be_set = n_colors;
-				SDL_Palette* current_palette = current_image->format->palette;
-
-				// one of the guard images (i=25) is only a single transparent pixel
-				// this caused SDL_SetPaletteColors to fail, I think because that palette contains only 2 colors
-				if (current_palette->ncolors < n_colors_to_be_set)
-					n_colors_to_be_set = current_palette->ncolors;
-				if (SDL_SetPaletteColors(current_palette, scolors, 0, n_colors_to_be_set) != 0) {
-					sdlperror("set_chtab_palette: SDL_SetPaletteColors");
-					quit(1);
-				}
-			}
-		}
-		free(scolors);
-	}
 }
 
 int has_timer_stopped(int timer_index) {

@@ -83,7 +83,7 @@ void __pascal far check_shadow() {
 		Char.room = drawn_room;
 		if (Char.room == 1) {
 			if (leveldoor_open != 0x4D) {
-				play_sound(sound_25_presentation); // presentation (level 6 shadow)
+				//play_sound(sound_25_presentation); // presentation (level 6 shadow)
 				leveldoor_open = 0x4D;
 			}
 			do_init_shad(/*&*/custom->init_shad_6, 2 /*stand*/);
@@ -529,7 +529,7 @@ void __pascal far sword_disappears() {
 void __pascal far meet_Jaffar() {
 	// Special event: play music
 	if (current_level == 13 && leveldoor_open == 0 && Char.room == 3) {
-		play_sound(sound_29_meet_Jaffar); // meet Jaffar
+		//play_sound(sound_29_meet_Jaffar); // meet Jaffar
 		// Special event: Jaffar waits a bit (28/12=2.33 seconds)
 		guard_notice_timer = 28;
 	}
@@ -545,7 +545,7 @@ void __pascal far play_mirr_mus() {
 		Char.curr_row == /*0*/ custom->mirror_row &&
 		Char.room == 11 /* TODO: add a custom option */
 	) {
-		play_sound(sound_25_presentation); // presentation (level 4 mirror)
+		//play_sound(sound_25_presentation); // presentation (level 4 mirror)
 		leveldoor_open = 0x4D;
 	}
 }
@@ -954,7 +954,7 @@ void __pascal far hurt_by_sword() {
 		Char.fall_y = 0;
 	}
 	// sound 13: Kid hurt (by sword), sound 12: Guard hurt (by sword)
-	play_sound(Char.charid == charid_0_kid ? sound_13_kid_hurt : sound_12_guard_hurt);
+	//play_sound(Char.charid == charid_0_kid ? sound_13_kid_hurt : sound_12_guard_hurt);
 	play_seq();
 }
 
@@ -1032,7 +1032,7 @@ void __pascal far check_hurting() {
 	// frame 154: poking
 	// frame 161: parrying
 	if (Char.frame == frame_154_poking && Opp.frame != frame_161_parry && Opp.action != actions_99_hurt) {
-		play_sound(sound_11_sword_moving); // sword moving
+		//play_sound(sound_11_sword_moving); // sword moving
 	}
 }
 
@@ -1064,7 +1064,7 @@ void __pascal far check_skel() {
 			Char.direction = dir_FF_left;
 			seqtbl_offset_char(seq_88_skel_wake_up); // skel wake up
 			play_seq();
-			play_sound(sound_44_skel_alive); // skel alive
+			//play_sound(sound_44_skel_alive); // skel alive
 			guard_skill = /*2*/ custom->skeleton_skill;
 			Char.alive = -1;
 			guardhp_max = guardhp_curr = 3;
