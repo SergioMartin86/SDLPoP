@@ -234,11 +234,6 @@ void __pascal far clear_kbd_buf() {
 
 // seg009:040A
 word __pascal far prandom(word max) {
-	if (!seed_was_init) {
-		// init from current time
-		random_seed = time(NULL);
-		seed_was_init = 1;
-	}
 	random_seed = random_seed * 214013 + 2531011;
 	return (random_seed >> 16) % (max + 1);
 }
