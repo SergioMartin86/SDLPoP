@@ -30,11 +30,10 @@ The authors of this program may be contacted at https://forum.princed.org
 #include "dirent.h"
 #endif
 
-#define __MAX_CACHED_FILES 2048
-long int _cachedFilePointerTable[__MAX_CACHED_FILES];
-char* _cachedFileBufferTable[__MAX_CACHED_FILES];
-size_t _cachedFileBufferSizes[__MAX_CACHED_FILES];
-char _cachedFilePathTable[__MAX_CACHED_FILES][POP_MAX_PATH];
+long int _cachedFilePointerTable[MAX_CACHED_FILES];
+char* _cachedFileBufferTable[MAX_CACHED_FILES];
+size_t _cachedFileBufferSizes[MAX_CACHED_FILES];
+char _cachedFilePathTable[MAX_CACHED_FILES][POP_MAX_PATH];
 size_t _cachedFileCounter = 0;
 
 FILE* fcache_open(const char * filename, const char * mode)

@@ -27,6 +27,7 @@ The authors of this program may be contacted at https://forum.princed.org
 #define strcasecmp _stricmp
 #endif
 
+#define MAX_CACHED_FILES 2048
 #define POP_MAX_PATH 256
 #define POP_MAX_OPTIONS_SIZE 256
 
