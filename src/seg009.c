@@ -2156,12 +2156,13 @@ void init_digi() {
 	desired->samples = 1024;
 	desired->callback = audio_callback;
 	desired->userdata = NULL;
-	if (SDL_OpenAudio(desired, NULL) != 0) {
-		sdlperror("init_digi: SDL_OpenAudio");
-		//quit(1);
-		digi_unavailable = 1;
-		return;
-	}
+
+//	if (SDL_OpenAudio(desired, NULL) != 0) {
+//		sdlperror("init_digi: SDL_OpenAudio");
+//		//quit(1);
+//		digi_unavailable = 1;
+//		return;
+//	}
 	//SDL_PauseAudio(0);
 	digi_audiospec = desired;
 }
