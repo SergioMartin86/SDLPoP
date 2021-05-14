@@ -1243,14 +1243,14 @@ void __pascal far check_the_end() {
 	if (next_room != 0 && next_room != drawn_room) {
 		drawn_room = next_room;
 		load_room_links();
-		if (current_level == /*14*/ custom->win_level && drawn_room == /*5*/ custom->win_room) {
-#ifdef USE_REPLAY
-			if (recording) stop_recording();
-			if (replaying) end_replay();
-#endif
-			// Special event: end of game
-			end_sequence();
-		}
+//		if (current_level == /*14*/ custom->win_level && drawn_room == /*5*/ custom->win_room) {
+//#ifdef USE_REPLAY
+//			if (recording) stop_recording();
+//			if (replaying) end_replay();
+//#endif
+//			// Special event: end of game
+//			end_sequence();
+//		}
 		different_room = 1;
 		exit_room_timer = 2; // Added to remember exit room timer
 		loadkid();
