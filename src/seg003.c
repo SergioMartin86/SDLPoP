@@ -541,38 +541,15 @@ void __pascal far check_mirror() {
 	word clip_top;
 	if (jumped_through_mirror == -1) {
 		jump_through_mirror();
-	} else {
-		if (get_tile_at_char() == tiles_13_mirror) {
-			loadkid();
-			load_frame();
-			check_mirror_image();
-			if (distance_mirror >= 0 && custom->show_mirror_image && Char.room == drawn_room) {
-				load_frame_to_obj();
-				reset_obj_clip();
-				clip_top = y_clip[Char.curr_row + 1];
-				if (clip_top < obj_y) {
-					obj_clip_top = clip_top;
-					obj_clip_left = (Char.curr_col << 5) + 9;
-					add_objtable(4); // mirror image
-				}
-			}
-		}
 	}
 }
 
 // seg003:080A
 void __pascal far jump_through_mirror() {
-	loadkid();
-	load_frame();
-	check_mirror_image();
 	jumped_through_mirror = 0;
 	Char.charid = charid_1_shadow;
-	play_sound(sound_45_jump_through_mirror); // jump through mirror
-	saveshad();
 	guardhp_max = guardhp_curr = hitp_max;
 	hitp_curr = 1;
-	draw_kid_hp(1, hitp_max);
-	draw_guard_hp(guardhp_curr, guardhp_max);
 }
 
 // seg003:085B
