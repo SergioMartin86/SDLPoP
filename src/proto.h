@@ -22,6 +22,7 @@ The authors of this program may be contacted at https://forum.princed.org
 void far pop_main();
 void __pascal far init_game_main();
 void __pascal far start_game();
+void __pascal far init_copyprot();
 int __pascal far process_key();
 void __pascal far play_frame();
 void __pascal far draw_game_frame();

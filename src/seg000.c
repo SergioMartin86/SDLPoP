@@ -178,6 +178,30 @@ void __pascal far init_game_main() {
 	start_game();
 }
 
+void __pascal far init_copyprot()
+{
+ word which_entry;
+ word pos;
+ word entry_used[40];
+ byte letts_used[26];
+
+ copyprot_plac = prandom(13);
+  memset(&entry_used, 0, sizeof(entry_used));
+  memset(&letts_used, 0, sizeof(letts_used));
+  for (pos = 0; pos < 14; ++pos) {
+   do {
+    if (pos == copyprot_plac) {
+     which_entry = copyprot_idx = prandom(39);
+    } else {
+     which_entry = prandom(39);
+    }
+   } while (entry_used[which_entry] || letts_used[copyprot_letter[which_entry]-'A']);
+   cplevel_entr[pos] = which_entry;
+   entry_used[which_entry] = 1;
+   letts_used[copyprot_letter[which_entry]-'A'] = 1;
+  }
+}
+
 
 // data:02C2
 word first_start = 1;
@@ -185,12 +209,6 @@ word first_start = 1;
 jmp_buf setjmp_buf;
 // seg000:0358
 void __pascal far start_game() {
-#ifdef USE_COPYPROT
-	word which_entry;
-	word pos;
-	word entry_used[40];
-	byte letts_used[26];
-#endif
 	// Prevent filling of stack.
 	// start_game is called from many places to restart the game, for example:
 	// process_key, play_frame, draw_game_frame, play_level, control_kid, end_sequence, expired
@@ -206,21 +224,7 @@ void __pascal far start_game() {
 	release_title_images(); // added
 	free_optsnd_chtab(); // added
 #ifdef USE_COPYPROT
-	copyprot_plac = prandom(13);
-	memset(&entry_used, 0, sizeof(entry_used));
-	memset(&letts_used, 0, sizeof(letts_used));
-	for (pos = 0; pos < 14; ++pos) {
-		do {
-			if (pos == copyprot_plac) {
-				which_entry = copyprot_idx = prandom(39);
-			} else {
-				which_entry = prandom(39);
-			}
-		} while (entry_used[which_entry] || letts_used[copyprot_letter[which_entry]-'A']);
-		cplevel_entr[pos] = which_entry;
-		entry_used[which_entry] = 1;
-		letts_used[copyprot_letter[which_entry]-'A'] = 1;
-	}
+	init_copyprot();
 #endif
 	if (custom->skip_title) { // CusPop option: skip the title sequence (level loads instantly)
 		int level_number = (start_level >= 0) ? start_level : custom->first_level;

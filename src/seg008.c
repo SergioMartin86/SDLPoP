@@ -736,12 +736,12 @@ int __pascal far get_loose_frame(byte modifier) {
 // Get an image, with index and NULL checks.
 image_type* get_image(short chtab_id, int id) {
 	if (chtab_id < 0 || chtab_id > COUNT(chtab_addrs)) {
-		// printf("Tried to use chtab %d not in 0..%d\n", chtab_id, (int)COUNT(chtab_addrs));
+		printf("Tried to use chtab %d not in 0..%d\n", chtab_id, (int)COUNT(chtab_addrs));
 		return NULL;
 	}
 	chtab_type* chtab = chtab_addrs[chtab_id];
 	if (chtab == NULL) {
-		// printf("Tried to use null chtab %d\n", chtab_id);
+		printf("Tried to use null chtab %d\n", chtab_id);
 		return NULL;
 	}
 	if (id < 0 || id >= chtab->n_images) {
@@ -1184,12 +1184,7 @@ void __pascal far load_alter_mod(int tilepos) {
 			*curr_tile_modif <<= 3;
 #ifdef USE_COPYPROT
 			if (current_level == 15) {
-				// Copy protection
-				if (copyprot_room[copyprot_plac] == loaded_room &&
-					copyprot_tile[copyprot_plac] == tilepos
-				) {
 					*curr_tile_modif = 6 << 3; // place open potion
-				}
 			}
 #endif
 			break;
