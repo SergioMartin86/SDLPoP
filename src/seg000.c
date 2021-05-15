@@ -2237,26 +2237,6 @@ const word copyprot_page[] = {5, 3, 7, 3, 3, 4, 1, 5,12, 5,11,10, 1, 2, 8, 8, 2,
 
 // seg000:23F4
 void __pascal far show_copyprot(int where) {
-#ifdef USE_COPYPROT
-	char sprintf_temp[140];
-	if (current_level != 15) return;
-	if (where) {
-		if (text_time_remaining || is_cutscene) return;
-		text_time_total = 1188;
-		text_time_remaining = 1188;
-		is_show_time = 0;
-		snprintf(sprintf_temp, sizeof(sprintf_temp),
-			"WORD %d LINE %d PAGE %d",
-			copyprot_word[copyprot_idx], copyprot_line[copyprot_idx], copyprot_page[copyprot_idx]);
-		display_text_bottom(sprintf_temp);
-	} else {
-		snprintf(sprintf_temp, sizeof(sprintf_temp),
-			"Drink potion matching the first letter of Word %d on Line %d\n"
-			"of Page %d of the manual.",
-			copyprot_word[copyprot_idx], copyprot_line[copyprot_idx], copyprot_page[copyprot_idx]);
-		show_dialog(sprintf_temp);
-	}
-#endif
 }
 
 // seg000:2489
